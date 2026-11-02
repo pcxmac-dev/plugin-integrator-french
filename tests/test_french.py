@@ -62,7 +62,7 @@ def test_the_app_loads_it_from_this_package_with_its_own_version():
     registry.reload()
     p = publishers().get("french")
     assert p is not None, dict(registry.errors())
-    assert p.origin == "package: liminal-plugin-french (liminal_plugin_french:PUBLISHER)"
+    assert p.origin in {"package: liminal-plugin-french (liminal_plugin_french:PUBLISHER)", "plugins/liminal-plugin-french (liminal_plugin_french:PUBLISHER)"}  # its package, or its checkout in the workspace\'s plugin directory
     assert p.version == version("liminal-plugin-french") and french.PUBLISHER.version == ""
     assert registry.api_refusal(p.api) is None and p.api == "1.4"
     assert not [why for where, why in registry.errors() if "french" in where or "french" in why]
