@@ -14,8 +14,8 @@ from __future__ import annotations
 
 from datetime import date
 
-from liminal.sources.dataset import Dataset, Parsed, months_after, ms, num, text
-from liminal.sources.publisher import Policy, Publisher
+from liminal_lib.sources.dataset import Dataset, Parsed, months_after, ms, num, text
+from liminal_lib.sources.publisher import Policy, Publisher
 
 FRENCH = "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/"
 LICENCE = "Kenneth R. French Data Library"

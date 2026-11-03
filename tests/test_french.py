@@ -5,8 +5,8 @@ from __future__ import annotations
 from datetime import date, datetime, timezone
 from importlib.metadata import version
 
-from liminal.sources import publishers, registry
-from liminal.sources.dataset import ms
+from liminal_lib.sources import publishers, registry
+from liminal_lib.sources.dataset import ms
 
 import liminal_plugin_french as french
 from liminal_plugin_french import parse_french
