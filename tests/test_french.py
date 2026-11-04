@@ -1,5 +1,6 @@
-"""The Ken French plugin, run against the app installed beside it: its tables read, and the app
-loading it from this package with its own version and the datasets it declared as a built-in."""
+"""The Ken French plugin, run against the library installed beside it: its tables read, its class on
+the plugin contract, and the app loading it from this package with its own version and the datasets
+it declared as a built-in."""
 from __future__ import annotations
 
 from datetime import date, datetime, timezone
@@ -7,9 +8,10 @@ from importlib.metadata import version
 
 from liminal_lib.sources import publishers, registry
 from liminal_lib.sources.dataset import ms
+from liminal_lib.sources.publisher import PublisherPlugin
 
 import liminal_plugin_french as french
-from liminal_plugin_french import parse_french
+from liminal_plugin_french import FrenchLibrary, parse_french
 
 FRENCH_DAILY = """This file was created by CMPT_ME_BEME_RETS_DAILY using the 202608 CRSP database.
 The Tbill return is the simple daily rate.
@@ -58,13 +60,31 @@ def test_french_tables():
     assert ("Agric", vw.values[0][1], 0.56) in vw.values and not any(v == 9.99 for *_, v in vw.values)
 
 
+def test_it_is_a_class_on_the_plugin_contract():
+    """The publisher is an instance of its class (plugin API 2.0), what it declares its class's
+    attributes, its hooks the contract's defaults; the app loads it as that class."""
+    p = french.PUBLISHER
+    assert type(p) is FrenchLibrary and issubclass(FrenchLibrary, PublisherPlugin) and not p.is_record
+    assert p.api == "2.0" and FrenchLibrary.api == "2.0" and p.KIND == "publisher"
+    assert not p.has_moments and not p.has_calendar and not p.reads_itself and not p.has_settings
+    assert p.moments(date(2026, 11, 3)) == () and p.calendar(date(2026, 11, 3)) == []  # the contract's defaults
+    assert FrenchLibrary.datasets is french.DATASETS and p.datasets == french.DATASETS
+    moved = p.with_(order=1)  # a changed copy, the registry's way (its origin and version)
+    assert type(moved) is FrenchLibrary and moved.order == 1 and p.order == 400 and moved.datasets == p.datasets
+    registry.reload()
+    loaded = publishers()["french"]
+    assert type(loaded) is FrenchLibrary and loaded.api == "2.0" and loaded.version == version("liminal-plugin-french")
+    assert registry.api_refusal(loaded.api, record=loaded.is_record) is None
+    assert not [why for where, why in registry.errors() if "french" in where or "french" in why]
+
+
 def test_the_app_loads_it_from_this_package_with_its_own_version():
     registry.reload()
     p = publishers().get("french")
     assert p is not None, dict(registry.errors())
     assert p.origin in {"package: liminal-plugin-french (liminal_plugin_french:PUBLISHER)", "plugins/liminal-plugin-french (liminal_plugin_french:PUBLISHER)"}  # its package, or its checkout in the workspace\'s plugin directory
     assert p.version == version("liminal-plugin-french") and french.PUBLISHER.version == ""
-    assert registry.api_refusal(p.api) is None and p.api == "1.4"
+    assert registry.api_refusal(p.api) is None and p.api == "2.0"
     assert not [why for where, why in registry.errors() if "french" in where or "french" in why]
     assert (p.title, p.kind, p.feeds) == ("Ken French Data Library", "research", ())
     assert [d.name for d in p.datasets] == ["french-3-factors-daily", "french-3-factors-monthly",
