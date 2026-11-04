@@ -6,7 +6,7 @@ two months after a month ends, so a first import's values are dated the 15th of 
 after theirs.
 
 A Liminal plugin released on its own: FrenchLibrary, a PublisherPlugin subclass (plugin API 2.0, the
-class contract of liminal_lib.sources.publisher), and PUBLISHER its instance, registered under the
+class contract of liminal_libs.sources.publisher), and PUBLISHER its instance, registered under the
 entry point group `liminal.providers` as `french`. It relies on the contract (datasets declared by a
 publisher) and nothing of the app outside it (docs/ARCHITECTURE.md in liminal: "Providers are
 plugins"); its version is this distribution's (pyproject.toml), so FrenchLibrary.version is left empty.
@@ -15,8 +15,8 @@ from __future__ import annotations
 
 from datetime import date
 
-from liminal_lib.sources.dataset import Dataset, Parsed, months_after, ms, num, text
-from liminal_lib.sources.publisher import Policy, PublisherPlugin
+from liminal_libs.sources.dataset import Dataset, Parsed, months_after, ms, num, text
+from liminal_libs.sources.publisher import Policy, PublisherPlugin
 
 FRENCH = "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/"
 LICENCE = "Kenneth R. French Data Library"
