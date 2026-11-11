@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "plugin-integrator-french"
-version = "0.2.0"  # the plugin's own release (CHANGELOG.md); the app shows it on the Plugins view
+version = "0.3.0"  # the plugin's own release (CHANGELOG.md); the app shows it on the Plugins view
 description = "Ken French's data library for Liminal: the Fama/French factors and the 49 industry portfolios as published, every revision kept."
 readme = "README.md"
 requires-python = ">=3.10"
 # the app it plugs into; which of its releases can load it is the plugin API the plugin declares
 # (PLUGIN.api, checked when the app loads it), not this line
-dependencies = ["liminal-libs>=1.4.0"]
+dependencies = ["liminal-libs>=1.49.0"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]

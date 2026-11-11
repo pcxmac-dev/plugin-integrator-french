@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.0 (2026-11-11)
+
+Its API on its page (plugin API 2.2, liminal-libs 1.49.0; the user: "each plugin should reflect the the API its
+attached to, and present links that provide documentation, the plugin interface should more or less contain what it
+already has, BUT, it should also expose more of what the API is about"). `FrenchLibrary.apis` (apis.py) is the
+library's card: Kenneth R. French's Data Library, zipped CSV files on the library's server, with its pages (the
+library, the 3 and 5 factors' and the 49 industries' details, the changes in CRSP data), every section of the library
+(the 3 and 5 factors and the industry portfolios it reads; the sorts, the momentum and reversal factors, the
+breakpoints, book equity, the benchmarks, the developed and emerging markets it does not), the four files it downloads
+and the library's others, verified 2026-11-11. Nothing it reads or does changes; it learns nothing while it runs, so
+`api_facts()` says nothing. Needs liminal-libs>=1.49.0. A test checks that the card names the files the plugin really
+reads; `LIMINAL_VENDOR_PAGES=1` asks each address on it.
+
 ## 0.2.0 (2026-11-03)
 
 Renamed `plugin-integrator-french` (the package `plugin_integrator_french`; it was `liminal-plugin-french`) on 2026-11-03: the naming by system (plugins are `plugin-<app>-<name>`), on liminal-libs 1.4.0 (`liminal_libs`, the library renamed with it).

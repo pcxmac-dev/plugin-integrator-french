@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from datetime import date, datetime, timezone
 from importlib.metadata import version
+from pathlib import Path
 
 from liminal_libs.sources import publishers, registry
 from liminal_libs.sources.dataset import ms
@@ -35,6 +36,18 @@ FRENCH_MONTHLY = """This file was created by CMPT_ME_BEME_RETS using the 202608 
 1927,   29.47,   -2.04,   -3.81,    3.12
 """
 
+def own_version(p) -> str:
+    """The version the app shows for it: its checkout's pyproject.toml when it is loaded from the workspace's
+    plugin directory (an editable install's metadata can lag behind a release), else its installed
+    distribution's."""
+    if p.origin.startswith("plugins/"):
+        import tomllib
+
+        pyproject = Path(__file__).resolve().parents[1] / "pyproject.toml"
+        return tomllib.loads(pyproject.read_text(encoding="utf-8"))["project"]["version"]
+    return version("plugin-integrator-french")
+
+
 INDUSTRIES = """  Average Equal Weighted Returns -- Daily
 ,Agric,Food ,Soda
 19260701,    9.99,    9.99,    9.99
@@ -61,11 +74,11 @@ def test_french_tables():
 
 
 def test_it_is_a_class_on_the_plugin_contract():
-    """The publisher is an instance of its class (plugin API 2.0), what it declares its class's
+    """The publisher is an instance of its class (plugin API 2.2), what it declares its class's
     attributes, its hooks the contract's defaults; the app loads it as that class."""
     p = french.PUBLISHER
     assert type(p) is FrenchLibrary and issubclass(FrenchLibrary, PublisherPlugin) and not p.is_record
-    assert p.api == "2.0" and FrenchLibrary.api == "2.0" and p.KIND == "publisher"
+    assert p.api == "2.2" and FrenchLibrary.api == "2.2" and p.KIND == "publisher"
     assert not p.has_moments and not p.has_calendar and not p.reads_itself and not p.has_settings
     assert p.moments(date(2026, 11, 3)) == () and p.calendar(date(2026, 11, 3)) == []  # the contract's defaults
     assert FrenchLibrary.datasets is french.DATASETS and p.datasets == french.DATASETS
@@ -73,7 +86,7 @@ def test_it_is_a_class_on_the_plugin_contract():
     assert type(moved) is FrenchLibrary and moved.order == 1 and p.order == 400 and moved.datasets == p.datasets
     registry.reload()
     loaded = publishers()["french"]
-    assert type(loaded) is FrenchLibrary and loaded.api == "2.0" and loaded.version == version("plugin-integrator-french")
+    assert type(loaded) is FrenchLibrary and loaded.api == "2.2" and loaded.version == own_version(loaded)
     assert registry.api_refusal(loaded.api, record=loaded.is_record) is None
     assert not [why for where, why in registry.errors() if "french" in where or "french" in why]
 
@@ -83,8 +96,8 @@ def test_the_app_loads_it_from_this_package_with_its_own_version():
     p = publishers().get("french")
     assert p is not None, dict(registry.errors())
     assert p.origin in {"package: plugin-integrator-french (plugin_integrator_french:PUBLISHER)", "plugins/plugin-integrator-french (plugin_integrator_french:PUBLISHER)"}  # its package, or its checkout in the workspace\'s plugin directory
-    assert p.version == version("plugin-integrator-french") and french.PUBLISHER.version == ""
-    assert registry.api_refusal(p.api) is None and p.api == "2.0"
+    assert p.version == own_version(p) and french.PUBLISHER.version == ""
+    assert registry.api_refusal(p.api) is None and p.api == "2.2"
     assert not [why for where, why in registry.errors() if "french" in where or "french" in why]
     assert (p.title, p.kind, p.feeds) == ("Ken French Data Library", "research", ())
     assert [d.name for d in p.datasets] == ["french-3-factors-daily", "french-3-factors-monthly",

@@ -5,11 +5,12 @@ fetched with the app's `datasets fetch` and again every 30 days. The library upd
 two months after a month ends, so a first import's values are dated the 15th of the second month
 after theirs.
 
-A Liminal plugin released on its own: FrenchLibrary, a PublisherPlugin subclass (plugin API 2.0, the
+A Liminal plugin released on its own: FrenchLibrary, a PublisherPlugin subclass (plugin API 2.2, the
 class contract of liminal_libs.sources.publisher), and PUBLISHER its instance, registered under the
 entry point group `liminal.providers` as `french`. It relies on the contract (datasets declared by a
-publisher) and nothing of the app outside it (docs/ARCHITECTURE.md in liminal: "Providers are
-plugins"); its version is this distribution's (pyproject.toml), so FrenchLibrary.version is left empty.
+publisher; what it attaches to, apis.py: the library's sections and files, its pages) and nothing of the
+app outside it (docs/ARCHITECTURE.md in liminal: "Providers are plugins"); its version is this
+distribution's (pyproject.toml), so FrenchLibrary.version is left empty.
 """
 from __future__ import annotations
 
@@ -18,7 +19,9 @@ from datetime import date
 from liminal_libs.sources.dataset import Dataset, Parsed, months_after, ms, num, text
 from liminal_libs.sources.publisher import Policy, PublisherPlugin
 
-FRENCH = "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/"
+from .apis import APIS, FILES
+
+FRENCH = FILES  # "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/": the library's files
 LICENCE = "Kenneth R. French Data Library"
 
 
@@ -78,10 +81,11 @@ DATASETS = (
 class FrenchLibrary(PublisherPlugin):
     """Ken French's data library as a publisher: a researcher's own library (kind research) with no
     feeds, its four datasets fetched from the library's server alone, inside its scrape checks. What
-    it declares are class attributes; it has no hook of its own (no release moments, no calendar, no
-    read of its own: the contract's defaults)."""
+    it declares are class attributes (what it attaches to among them: `apis`, the library's card); it
+    has no hook of its own (no release moments, no calendar, no read of its own, nothing learned for
+    api_facts: the contract's defaults)."""
 
-    api = "2.0"  # the contract it needs (the class contract); its version: the distribution's
+    api = "2.2"  # the contract it needs (2.2: what it attaches to); its version: the distribution's
     name = "french"
     title = "Ken French Data Library"
     order = 400
@@ -89,6 +93,7 @@ class FrenchLibrary(PublisherPlugin):
     about = "Fama/French 3 and 5 factors and 49 industry portfolios, daily and monthly from 1926 (datasets)"
     feeds = ()
     datasets = DATASETS
+    apis = APIS  # the library, its sections and files, its pages (apis.py)
     policy = Policy(hosts=("mba.tuck.dartmouth.edu",), min_minutes=60, per_day=20,
                     terms="the library's files are free to download for research; cite the library",
                     terms_url="https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html")
